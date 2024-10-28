@@ -1,0 +1,15 @@
+.link {
+  text-align: center;
+  font-size: 24px;
+  color: #81b3d8;
+  transition: 0.2s ease all;
+  text-decoration: none;
+
+  &:hover, &:active, {
+    color: #81b3d899;
+  }
+}
+
+.active {
+  color: #ffd7f6;
+}
