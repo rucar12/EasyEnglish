@@ -1,5 +1,5 @@
 import express from "express";
-import { login, register } from "../controllers/auth";
+import {login, logout, refresh, register} from "../controllers/auth";
 
 const router = express.Router();
 
@@ -55,7 +55,7 @@ router.post("/register", register);
  *             schema:
  *               type: object
  *               properties:
- *                 token:
+ *                 accessToken:
  *                   type: string
  *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
  *       401:
@@ -64,5 +64,55 @@ router.post("/register", register);
  *         description: Server error
  */
 router.post("/login", login);
+
+/**
+ * @swagger
+ * /api/auth/refresh:
+ *   post:
+ *     summary: Refreshes the access token using a valid refresh token
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: Success - New access token created
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 accessToken:
+ *                   type: string
+ *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+ *       400:
+ *         description: Invalid refresh token
+ *       401:
+ *         description: Access Denied. No refresh token provided
+ *       500:
+ *         description: Server error
+ */
+
+router.post('/refresh', refresh);
+
+/**
+ * @swagger
+ * /api/auth/logout:
+ *   post:
+ *     summary: Logout user
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: Successfully logged out
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Logged out successfully
+ *       500:
+ *         description: Server error
+ */
+
+router.post('/logout', logout);
 
 export default router;

@@ -32,10 +32,43 @@ export const login = async (req: Request, res: Response) => {
             return
         }
 
-        const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: "1h" });
-        res.status(201).json({ token });
+        const accessToken = jwt.sign({ user }, JWT_SECRET, { expiresIn: '1h' });
+        const refreshToken = jwt.sign({ user }, JWT_SECRET, { expiresIn: '1d' });
+
+        res
+            .cookie('refreshToken', refreshToken, { httpOnly: true, sameSite: 'strict' })
+            .header('Authorization', accessToken)
+            .status(201)
+            .send({accessToken});
     } catch (error) {
         res.status(500).json({ error: "Login failed" });
     }
+};
+
+export const refresh = async (req: Request, res: Response) => {
+    const refreshToken = req.cookies['refreshToken'];
+    if (!refreshToken) {
+         res.status(401).send('Access Denied. No refresh token provided.');
+         return
+    }
+
+    try {
+        const decoded = jwt.verify(refreshToken, JWT_SECRET) as {user?: User};
+        const accessToken = jwt.sign({ user: decoded.user }, JWT_SECRET, { expiresIn: '1h' });
+
+        res
+            .header('Authorization', accessToken)
+            .send({accessToken});
+    } catch (error) {
+         res.status(400).send('Invalid refresh token.');
+         return
+    }
+};
+
+export const logout = (req: Request, res: Response) => {
+    res
+        .clearCookie('refreshToken', { httpOnly: true, sameSite: 'strict' })
+        .status(200)
+        .json({ message: 'Logged out successfully' });
 };
 

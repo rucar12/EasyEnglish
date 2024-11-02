@@ -1,6 +1,6 @@
 import express from "express";
 import {getUsers, addUser, getUser} from "../controllers/users";
-import {authenticateToken} from "../middleware/auth";
+import {authenticateJWT} from "../middleware/auth";
 
 const router = express.Router();
 
@@ -22,7 +22,7 @@ const router = express.Router();
  *       500:
  *         description: Server error
  */
-router.get("/users", getUsers);
+router.get("/users", authenticateJWT, getUsers);
 
 /**
  * @swagger
@@ -49,7 +49,7 @@ router.get("/users", getUsers);
  *       500:
  *         description: Server error
  */
-router.get("/user", getUser);
+router.get("/user", authenticateJWT, getUser);
 
 /**
  * @swagger
@@ -69,6 +69,6 @@ router.get("/user", getUser);
  *       500:
  *         description: Server error
  */
-router.post("/user", addUser);
+router.post("/user", authenticateJWT, addUser);
 
 export default router;
