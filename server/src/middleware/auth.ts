@@ -12,13 +12,15 @@ export const authenticateJWT = (req: AuthedRequest, res: Response, next: NextFun
     const accessToken = req.headers['authorization'] as string;
     const refreshToken = req.cookies['refreshToken'];
 
-    if (!accessToken && !refreshToken) {
+    if (!accessToken || !refreshToken) {
          res.status(401).send('Access Denied. No token provided.');
          return
     }
 
+    const splittedAccess = accessToken.split('Bearer ')?.[1] as string
+
     try {
-        const decoded = jwt.verify(accessToken, JWT_SECRET) as {user?: User};
+        const decoded = jwt.verify(splittedAccess, JWT_SECRET) as {user?: User};
         req.user = decoded.user;
         next();
     } catch (error) {
@@ -26,7 +28,6 @@ export const authenticateJWT = (req: AuthedRequest, res: Response, next: NextFun
              res.status(401).send('Access Denied. No refresh token provided.');
              return;
         }
-
         try {
             const decoded = jwt.verify(refreshToken, JWT_SECRET) as {user?: User};
             const accessToken = jwt.sign({ user: decoded.user }, JWT_SECRET, { expiresIn: '1h' });

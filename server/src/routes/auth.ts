@@ -1,11 +1,12 @@
 import express from "express";
-import {login, logout, refresh, register} from "../controllers/auth";
+import {changePassword, login, logout, refresh, register} from "../controllers/auth";
+import {authenticateJWT} from "../middleware/auth";
 
 const router = express.Router();
 
 /**
  * @swagger
- * /api/auth/register:
+ * /auth/register:
  *   post:
  *     summary: Register new user
  *     tags: [Auth]
@@ -27,7 +28,7 @@ router.post("/register", register);
 
 /**
  * @swagger
- * /api/auth/login:
+ * /auth/login:
  *   post:
  *     summary: User authorization
  *     tags: [Auth]
@@ -67,7 +68,7 @@ router.post("/login", login);
 
 /**
  * @swagger
- * /api/auth/refresh:
+ * /auth/refresh:
  *   post:
  *     summary: Refreshes the access token using a valid refresh token
  *     tags: [Auth]
@@ -94,7 +95,7 @@ router.post('/refresh', refresh);
 
 /**
  * @swagger
- * /api/auth/logout:
+ * /auth/logout:
  *   post:
  *     summary: Logout user
  *     tags: [Auth]
@@ -114,5 +115,50 @@ router.post('/refresh', refresh);
  */
 
 router.post('/logout', logout);
+
+/**
+ * @swagger
+ * /auth/change-password:
+ *   post:
+ *     summary: Change user password
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - currentPassword
+ *               - newPassword
+ *             properties:
+ *               currentPassword:
+ *                 type: string
+ *                 example: currentpassword123
+ *               newPassword:
+ *                 type: string
+ *                 example: newpassword456
+ *     responses:
+ *       200:
+ *         description: Password changed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Password changed successfully
+ *       401:
+ *         description: Unauthorized or current password incorrect
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Server error
+ */
+
+router.post('/change-password', authenticateJWT, changePassword);
 
 export default router;

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import {createUser, getUserByEmail} from "../models/users";
+import {createUser, getUserByEmail, updateUserPassword} from "../models/users";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { User } from "../types";
@@ -72,3 +72,31 @@ export const logout = (req: Request, res: Response) => {
         .json({ message: 'Logged out successfully' });
 };
 
+
+export const changePassword = async (req: Request, res: Response) => {
+    const { currentPassword, newPassword } = req.body;
+
+    const refreshToken = req.cookies['refreshToken'];
+    const decoded = jwt.verify(refreshToken, JWT_SECRET) as {user?: User};
+    const user = decoded.user;
+    console.log(decoded, refreshToken, 'here')
+    try {
+        if (!user) {
+            res.status(404).json({ error: "User not found" });
+            return;
+        }
+
+        const isMatch = await bcrypt.compare(currentPassword, user.password);
+        if (!isMatch) {
+            res.status(401).json({ error: "Current password is incorrect" });
+            return;
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        await updateUserPassword(user.id!, hashedPassword);
+
+        res.status(200).json({ message: "Password changed successfully" });
+    } catch (error) {
+        res.status(500).json({ error: "Password change failed" });
+    }
+};

@@ -6,20 +6,28 @@ export async function createUser(email: string, password: string, firstName: str
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const result = await db.run(
+    await db.run(
         `INSERT INTO users (email, password, firstName, lastName) VALUES (?, ?, ?, ?)`,
         email,
         hashedPassword,
         firstName,
         lastName
     );
-    console.log('-----')
-    console.log(result)
-    console.log('-------')
-    return result;
 }
 
-export async function getUserByEmail(email: string) {
+export async function updateUserPassword(userId: number, newPassword: string): Promise<void> {
+    await db.run(
+        `UPDATE users SET password = ? WHERE id = ?`,
+        newPassword,
+        userId
+    );
+}
+
+export async function getUserByEmail(email?: string) {
+    if (!email) {
+        throw new Error('Email is required!')
+        return
+    }
     return new Promise((resolve, reject) => {
         db.get('SELECT * FROM users WHERE email = ?', email, (err, row) => {
             if (err) {
