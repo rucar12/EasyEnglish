@@ -3,10 +3,11 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import helmet from "helmet";
 
-import swaggerUi from 'swagger-ui-express';
-
-import userRoutes from "./routes/users";
 import authRoutes from "./routes/auth";
+import usersRoutes from "./routes/users";
+import videosRoutes from "./routes/videos";
+
+import swaggerUi from 'swagger-ui-express';
 import { swaggerDocs } from "./config/swagger";
 import cookieParser from "cookie-parser";
 
@@ -22,8 +23,9 @@ app.use(cookieParser());
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
-app.use("/", userRoutes);
 app.use("/auth", authRoutes);
+app.use("/", usersRoutes);
+app.use("/videos", videosRoutes);
 
 
 app.listen(port, () => {

@@ -6,7 +6,7 @@ const router = express.Router();
 
 /**
  * @swagger
- * /api/users:
+ * /users:
  *   get:
  *     summary: Get all users
  *     tags: [Users]
@@ -26,7 +26,7 @@ router.get("/users", authenticateJWT, getUsers);
 
 /**
  * @swagger
- * /api/user:
+ * /user:
  *   get:
  *     summary: Get single user
  *     tags: [Users]
@@ -53,7 +53,7 @@ router.get("/user", authenticateJWT, getUser);
 
 /**
  * @swagger
- * /api/user:
+ * /user:
  *   post:
  *     summary: Create new user
  *     tags: [Users]

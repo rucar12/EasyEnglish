@@ -27,6 +27,15 @@ export const db = new sqlite3.Database(dbFile, (err) => {
                 }
             }
         );
-
+        db.run(`
+        CREATE TABLE IF NOT EXISTS videos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            userId INTEGER NOT NULL,
+            title TEXT,
+            description TEXT,
+            url TEXT NOT NULL,
+            FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
+        )
+    `);
     }
 });
